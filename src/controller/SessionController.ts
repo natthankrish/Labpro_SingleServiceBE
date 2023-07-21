@@ -1,6 +1,6 @@
 import { AppDataSource } from "../data-source"
 import { NextFunction, Request, Response, CookieOptions } from "express"
-import { signJWT } from "../jwt/jwt"
+import { signJWT } from "../utils/jwt"
 import { UserAgent } from "../agent/UserAgent"
 import { User } from "../entity/User"
 import { DataSource } from "typeorm"
@@ -42,31 +42,4 @@ export async function registerAdmin(request: Request, response: Response, data: 
     const { username, password, name} = request.body;
     await data.insert(username, password, name);
     return response.send("Success")
-}
-
-// log out handler
-export function    getSessionHandler(request: Request, response: Response) {
-    // @ts-ignore
-    return response.send(request.user);
-}
-  
-export function deleteSessionHandler(request: Request, response: Response) {
-    response.cookie("accessToken", "", {
-        maxAge: 0,
-        httpOnly: true,
-    });
-
-    response.cookie("refreshToken", "", {
-        maxAge: 0,
-        httpOnly: true,
-    });
-
-    // @ts-ignore
-    const session = invalidateSession(request.user.sessionId);
-
-    return response.send(session);
-}
-
-export function test(request: Request, response: Response) {
-    return response.json({username:"hehe"});
 }

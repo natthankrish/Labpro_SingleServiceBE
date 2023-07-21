@@ -1,8 +1,6 @@
-import { AppDataSource } from "../data-source"
-import { NextFunction, Request, Response } from "express"
 import { Barang } from "../entity/Barang"
 import { DataSource, Repository } from "typeorm"
-import { UpsertOptions } from "typeorm/repository/UpsertOptions";
+import { Perusahaan } from "../entity/Perusahaan";
 
 export class BarangAgent {
 
@@ -12,49 +10,106 @@ export class BarangAgent {
         this.userRepository = this.db.manager.getRepository(Barang)
     }
 
-    // async all(request: Request, response: Response, next: NextFunction) {
-    //     return this.userRepository.find()
-    // }
+    async all() {
+        return this.userRepository.find()
+    }
 
-    // async one(username: string): Promise<Barang> {
-    //     const user = await this.userRepository.findOne({
-    //         where: { id: username }
-    //     })
+    async filter(query: string, perusahaan:Perusahaan) {
+        return this.userRepository.find({
+            where: {perusahaan: perusahaan}
+        })
+    }
 
-    //     if (!user) {
-    //         return null;
-    //     }
-    //     return user
-    // }
+    async search1() {
+        return this.userRepository
+                        .createQueryBuilder('barang')
+                        .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
+                        .getMany();
+    }
 
-    // async insert(username: string, password:string, name:string) {
-    //     const user = new User(username, password, name);
-    //     await this.userRepository.insert(user);
-    // }
+    async search2(searchString: string) {
+        return this.userRepository
+            .createQueryBuilder('barang')
+            .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
+            .where('barang.nama LIKE :searchString OR barang.kode LIKE :searchString', { searchString: `%${searchString}%` })
+            .getMany();
+    }
 
-    // async save(request: Request, response: Response, next: NextFunction) {
-    //     const { username, password } = request.body;
+    async search3(perusahaan_id: string) {
+        return this.userRepository
+                .createQueryBuilder('barang')
+                .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
+                .where('perusahaan.id = :perusahaanString', { perusahaan_id })
+                .getMany();
+    }
 
-    //     const user = Object.assign(new User(), {
-    //         username,
-    //         password
-    //     })
+    async search4(perusahaan_id: string, searchString:string) {
+        return this.userRepository
+            .createQueryBuilder('barang')
+            .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
+            .where('barang.nama LIKE :searchString OR barang.kode LIKE :searchString', { searchString: `%${searchString}%` })
+            .andWhere('perusahaan.id = :perusahaanString', { perusahaan_id })
+            .getMany();
+    }
 
-    //     return this.userRepository.save(user)
-    // }
+    async one(id: string): Promise<Barang> {
+        const user = await this.userRepository.findOne({
+            where: { id: id }
+        })
 
-    // async remove(request: Request, response: Response, next: NextFunction) {
-    //     const id = parseInt(request.params.id)
+        if (!user) {
+            return null;
+        }
+        return user
+    }
 
-    //     let userToRemove = await this.userRepository.findOneBy({ id })
+    async test(kode: string): Promise<Barang> {
+        const user = await this.userRepository.findOne({
+            where: { kode: kode }
+        })
 
-    //     if (!userToRemove) {
-    //         return "this user not exist"
-    //     }
+        if (!user) {
+            return null;
+        }
+        return user
+    }
 
-    //     await this.userRepository.remove(userToRemove)
+    async insert(nama:string, harga:number, stok:number, perusahaan:Perusahaan, kode:string) {
+        const barang = new Barang(nama, harga, stok, kode, perusahaan);
+        await this.userRepository.insert(barang);
+        return barang;
+    }
 
-    //     return "user has been removed"
-    // }
+    async delete(id: string): Promise<Barang> {
+        const barang = await this.userRepository.findOne({
+            where: { id: id }
+        })
 
+        if (!barang) {
+            return null;
+        }
+
+        await this.userRepository.delete({
+            id: id 
+        })
+
+        return barang
+    }
+
+    async update(id: string, nama:string, harga:number, stok:number, perusahaan:Perusahaan, kode:string): Promise<Barang> {
+        const barang = await this.userRepository.findOne({
+            where: { id: id }
+        })
+
+        barang.id = id;
+        barang.nama = nama;
+        barang.harga = harga;
+        barang.stok = stok;
+        barang.perusahaan = perusahaan;
+        barang.kode = kode;
+
+        await this.userRepository.save(barang);
+
+        return barang
+    }
 }

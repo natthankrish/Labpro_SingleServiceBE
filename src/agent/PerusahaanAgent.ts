@@ -21,7 +21,7 @@ export class PerusahaanAgent {
                         .getMany();
     }
 
-    async one(id: string): Promise<Perusahaan> {
+    async one(id: string) {
         const perusahaan = await this.userRepository.findOne({
             where: { id: id }
         })

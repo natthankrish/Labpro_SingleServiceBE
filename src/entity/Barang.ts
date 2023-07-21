@@ -1,9 +1,9 @@
-import { Entity, PrimaryColumn, Column, ManyToOne} from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne} from "typeorm"
 import { Perusahaan } from './Perusahaan';
 
 @Entity()
 export class Barang {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn('uuid')
     id: string
 
     @Column()
@@ -21,8 +21,7 @@ export class Barang {
     @ManyToOne(() => Perusahaan, perusahaan => perusahaan.barangs)
     perusahaan: Perusahaan;
 
-    constructor(id:string, nama:string, harga:number, stok:number, kode:string, perusahaan: Perusahaan) {
-        this.id = id;
+    constructor(nama:string, harga:number, stok:number, kode:string, perusahaan: Perusahaan) {
         this.nama = nama;
         this.harga = harga;
         this.stok = stok;

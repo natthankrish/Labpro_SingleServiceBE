@@ -4,7 +4,7 @@ import * as cookieParser from "cookie-parser";
 import * as cors from "cors";
 import routes from "./routes"
 import { port } from "./config"
-import postgresSetup from "./jwt/postgres";
+import postgresSetup from "./utils/postgres";
 
 const app = express();
 

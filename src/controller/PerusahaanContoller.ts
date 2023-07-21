@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
 import { PerusahaanAgent } from "../agent/PerusahaanAgent"
+import { type } from "os";
 
 
 export async function addPerusahaanHandler(request: Request, response: Response, data: PerusahaanAgent) {
@@ -49,6 +50,10 @@ export async function updatePerusahaanHandler(request: Request, response: Respon
     const { id } = request.params;
     const { nama, alamat, no_telp, kode } = request.body;
 
+    if (id == "undefined") {
+        return;
+    }
+
     const perusahaan = await data.update(id, nama, alamat, no_telp, kode);
 
     if (!perusahaan) {
@@ -78,7 +83,7 @@ export async function getDetailPerusahaanHandler(request: Request, response: Res
     const perusahaan = await data.one(id);
 
     if (!perusahaan) {
-        return response.status(401).json({
+        return response.status(200).json({
             status: "error",
             message: `Perusahaan Not Found`,
             data: null
