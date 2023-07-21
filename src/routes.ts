@@ -1,40 +1,51 @@
+import { Express } from "express";
 import { UserController } from "./controller/UserController"
-import { SessionController } from "./controller/SessionController";
-import requireUser from "./middleware/requireUser";
+import { createSessionHandler, registerAdmin } from "./controller/SessionController";
+import { DataSource } from "typeorm";
 
-export const Routes = [{
-    method: "get",
-    route: "/users",
-    controller: UserController,
-    action: "all"
-}, {
-    method: "get",
-    route: "/users/:id",
-    controller: UserController,
-    action: "one"
-}, {
-    method: "post",
-    route: "/users",
-    controller: UserController,
-    action: "save"
-}, {
-    method: "delete",
-    route: "/users/:id",
-    controller: UserController,
-    action: "remove"
-}, {
-    method: "post",
-    route: "/api/session",
-    controller: SessionController,
-    action: "createSessionHandler"
-}, {
-    method: "delete",
-    route: "/api/session",
-    controller: SessionController,
-    action: "logoutHandler"
-}, {
-    method: "get",
-    route: "/api/protected",
-    controller: SessionController,
-    action: "getSessionHandler"
-}]
+function routes(app: Express, db: DataSource) {
+    const user = new UserController(db);
+
+    app.get('/posts', (req, res) => {
+        res.json({username: "hehe"});
+    })
+
+    app.post('/login', (req, res) => {
+        createSessionHandler(req, res, user);
+    })
+
+    app.post('/register', (req, res) => {
+        registerAdmin(req, res, user);
+    })
+
+    app.get('/barang', (req, res) => {
+        return res.status(200).json({
+            status: "success",
+            message: "hehe",
+            data: []
+        })
+    })
+
+    app.get('/perusahaan', (req, res) => {
+        return res.status(200).json({
+            status: "success",
+            message: "hehe",
+            data: []
+        })
+    })
+
+    app.get('/self', (req, res) => {
+        return res.status(200).json({
+            status: "success",
+            message: "hehe",
+            data: {
+                username:"haha",
+                name:"haha",
+            }
+        })
+    })
+
+
+}
+
+export default routes;

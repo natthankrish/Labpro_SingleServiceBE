@@ -1,18 +1,24 @@
+import internal = require("stream");
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
 
 @Entity()
 export class User {
 
     @PrimaryGeneratedColumn()
-    id: number
+    id:number
 
     @Column()
-    firstName: string
+    username: string
 
     @Column()
-    lastName: string
+    password: string
 
-    @Column()
-    age: number
+    constructor(username, password) {
+        this.username = username;
+        this.password = password;
+    }
 
+    public getPassword() {
+        return this.password;
+    }
 }

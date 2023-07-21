@@ -1,47 +1,40 @@
 import * as express from "express"
 import * as bodyParser from "body-parser"
-import cookieParser from "cookie-parser";
-import cors from "cors";
+import * as cookieParser from "cookie-parser";
+import * as cors from "cors";
+import * as jwt from "jsonwebtoken"
 import { Request, Response } from "express"
 import { AppDataSource } from "./data-source"
-import { Routes } from "./routes"
+import routes from "./routes"
 import { User } from "./entity/User"
 
 import { port } from "./config"
+import deserializeUser from "./middleware/deserializeUser";
+import postgresSetup from "./jwt/postgres";
 
-function handleError(err, req, res, next) {
-    res.status(err.statusCode || 500).send(err.message);
-}
+const app = express();
 
-AppDataSource.initialize().then(async () => {
-    const app = express()
-    app.use(bodyParser.json())
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-    Routes.forEach(route => {
-        (app as any)[route.method](route.route, async (req: Request, res: Response, next: Function) => {
-            try {
-                const result = await (new (route.controller as any))[route.action](req, res, next)
-                res.json(result);
-            } catch (error) {
-                next(error);
-            }
-        })
-    })
+app.use(deserializeUser);
 
-    app.use(cookieParser());
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: false }));
-
-    app.use(
+app.use(
     cors({
         credentials: true,
-        origin: "http://localhost:3000",
+        origin: '*',
     })
-    );
+);
 
-    app.use(handleError)
-    app.listen(port)
+async function main() {
+    app.listen(port, () => {
+        console.log(`Server listening at http://localhost:${port}`);
+    });
 
-    console.log(`Express server has started on port ${port}. Open http://localhost:${port}/users to see results`)
+    const db = await postgresSetup();
 
-}).catch(error => console.log(error))
+    routes(app, db);
+}
+
+main();

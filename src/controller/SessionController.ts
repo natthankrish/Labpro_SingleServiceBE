@@ -1,54 +1,73 @@
 import { AppDataSource } from "../data-source"
 import { NextFunction, Request, Response, CookieOptions } from "express"
-import { }
+import { signJWT } from "../jwt/jwt"
+import * as db from "./DatabaseController"
+import { UserController } from "./UserController"
 import { User } from "../entity/User"
+import { DataSource } from "typeorm"
 
-export class UserController {
 
-    private userRepository = AppDataSource.getRepository(User)
+export async function createSessionHandler(request: Request, response: Response, data: UserController) {
+    const { username, password } = request.body;
 
-    async all(request: Request, response: Response, next: NextFunction) {
-        return this.userRepository.find()
+    const user = await data.one(username);
+
+    if (!user || user.getPassword() !== password) {
+        return response.status(401).json({
+            status: "error",
+            message: "Invalid email or password",
+            data: null,
+        });
     }
 
-    async one(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id)
+    const accessToken = signJWT(
+        { username: username },
+        "5s"
+    );
 
 
-        const user = await this.userRepository.findOne({
-            where: { id }
-        })
+    return response.status(200).json({
+        status: "success",
+        message: "Login Successful",
+        data: {
+            user: {
+                username: username,
+                name: "haha",
+            },
+            token: accessToken,
+        },
+    })
+}
 
-        if (!user) {
-            return "unregistered user"
-        }
-        return user
-    }
+export async function registerAdmin(request: Request, response: Response, data: UserController) {
+    const { username, password } = request.body;
+    await data.insert(username, password);
+    return response.send("Success")
+}
 
-    async save(request: Request, response: Response, next: NextFunction) {
-        const { firstName, lastName, age } = request.body;
+// log out handler
+export function    getSessionHandler(request: Request, response: Response) {
+    // @ts-ignore
+    return response.send(request.user);
+}
+  
+export function deleteSessionHandler(request: Request, response: Response) {
+    response.cookie("accessToken", "", {
+        maxAge: 0,
+        httpOnly: true,
+    });
 
-        const user = Object.assign(new User(), {
-            firstName,
-            lastName,
-            age
-        })
+    response.cookie("refreshToken", "", {
+        maxAge: 0,
+        httpOnly: true,
+    });
 
-        return this.userRepository.save(user)
-    }
+    // @ts-ignore
+    const session = invalidateSession(request.user.sessionId);
 
-    async remove(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id)
+    return response.send(session);
+}
 
-        let userToRemove = await this.userRepository.findOneBy({ id })
-
-        if (!userToRemove) {
-            return "this user not exist"
-        }
-
-        await this.userRepository.remove(userToRemove)
-
-        return "user has been removed"
-    }
-
+export function test(request: Request, response: Response) {
+    return response.json({username:"hehe"});
 }
