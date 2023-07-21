@@ -1,10 +1,13 @@
 import { Express } from "express";
-import { UserController } from "./controller/UserController"
+import { UserAgent } from "./agent/UserAgent"
 import { createSessionHandler, registerAdmin } from "./controller/SessionController";
+import * as PerusahaanHandler from "./controller/PerusahaanContoller";
 import { DataSource } from "typeorm";
+import { PerusahaanAgent } from "./agent/PerusahaanAgent";
 
 function routes(app: Express, db: DataSource) {
-    const user = new UserController(db);
+    const user = new UserAgent(db);
+    const perusahaan = new PerusahaanAgent(db);
 
     app.get('/posts', (req, res) => {
         res.json({username: "hehe"});
@@ -18,15 +21,27 @@ function routes(app: Express, db: DataSource) {
         registerAdmin(req, res, user);
     })
 
-    app.get('/barang', (req, res) => {
-        return res.status(200).json({
-            status: "success",
-            message: "hehe",
-            data: []
-        })
+    app.get('/perusahaan', (req, res) => {
+        PerusahaanHandler.getPerusahaanHandler(req, res, perusahaan);
     })
 
-    app.get('/perusahaan', (req, res) => {
+    app.post('/perusahaan', (req, res) => {
+        PerusahaanHandler.addPerusahaanHandler(req, res, perusahaan);
+    })
+
+    app.get('/perusahaan/:id', (req, res) => {
+        PerusahaanHandler.getDetailPerusahaanHandler(req, res, perusahaan);
+    })
+
+    app.delete('/perusahaan/:id', (req, res) => {
+        PerusahaanHandler.deletePerusahaanHandler(req, res, perusahaan);
+    })
+
+    app.put('/perusahaan/:id', (req, res) => {
+        PerusahaanHandler.updatePerusahaanHandler(req, res, perusahaan);
+    })
+    
+    app.get('/barang', (req, res) => {
         return res.status(200).json({
             status: "success",
             message: "hehe",
@@ -40,7 +55,7 @@ function routes(app: Express, db: DataSource) {
             message: "hehe",
             data: {
                 username:"haha",
-                name:"haha",
+                name:"admin",
             }
         })
     })

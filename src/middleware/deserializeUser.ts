@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { getSession } from "../controller/DatabaseController";
 import { signJWT, verifyJWT } from "../jwt/jwt";
 
 function deserializeUser(req: Request, res: Response, next: NextFunction) {

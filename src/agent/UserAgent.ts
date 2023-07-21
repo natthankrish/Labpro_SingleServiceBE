@@ -4,7 +4,7 @@ import { User } from "../entity/User"
 import { DataSource, Repository } from "typeorm"
 import { UpsertOptions } from "typeorm/repository/UpsertOptions";
 
-export class UserController {
+export class UserAgent {
 
     private userRepository: Repository<User>;
 
@@ -27,8 +27,8 @@ export class UserController {
         return user
     }
 
-    async insert(username: string, password:string) {
-        const user = new User(username, password);
+    async insert(username: string, password:string, name:string) {
+        const user = new User(username, password, name);
         await this.userRepository.insert(user);
     }
 

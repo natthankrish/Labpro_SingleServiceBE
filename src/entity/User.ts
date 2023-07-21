@@ -1,20 +1,19 @@
-import internal = require("stream");
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { Entity, PrimaryColumn, Column } from "typeorm"
 
 @Entity()
 export class User {
-
-    @PrimaryGeneratedColumn()
-    id:number
+    @PrimaryColumn()
+    username: string
 
     @Column()
-    username: string
+    name: string
 
     @Column()
     password: string
 
-    constructor(username, password) {
+    constructor(username:string, name:string, password:string) {
         this.username = username;
+        this.name = name;
         this.password = password;
     }
 

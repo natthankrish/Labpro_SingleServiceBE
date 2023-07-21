@@ -1,13 +1,12 @@
 import { AppDataSource } from "../data-source"
 import { NextFunction, Request, Response, CookieOptions } from "express"
 import { signJWT } from "../jwt/jwt"
-import * as db from "./DatabaseController"
-import { UserController } from "./UserController"
+import { UserAgent } from "../agent/UserAgent"
 import { User } from "../entity/User"
 import { DataSource } from "typeorm"
 
 
-export async function createSessionHandler(request: Request, response: Response, data: UserController) {
+export async function createSessionHandler(request: Request, response: Response, data: UserAgent) {
     const { username, password } = request.body;
 
     const user = await data.one(username);
@@ -39,9 +38,9 @@ export async function createSessionHandler(request: Request, response: Response,
     })
 }
 
-export async function registerAdmin(request: Request, response: Response, data: UserController) {
-    const { username, password } = request.body;
-    await data.insert(username, password);
+export async function registerAdmin(request: Request, response: Response, data: UserAgent) {
+    const { username, password, name} = request.body;
+    await data.insert(username, password, name);
     return response.send("Success")
 }
 
