@@ -32,6 +32,17 @@ export class PerusahaanAgent {
         return perusahaan
     }
 
+    async name(name: string): Promise<Perusahaan> {
+        const user = await this.userRepository.findOne({
+            where: { nama: name }
+        })
+
+        if (!user) {
+            return null;
+        }
+        return user
+    }
+
     async insert(nama:string, alamat:string, no_telp:string, kode:string): Promise<Perusahaan> {
         const perusahaan = new Perusahaan(nama, alamat, no_telp, kode);
         await this.userRepository.insert(perusahaan);

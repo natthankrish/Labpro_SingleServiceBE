@@ -2,7 +2,6 @@ import { Request, Response } from "express"
 import { BarangAgent } from "../agent/BarangAgent"
 import { PerusahaanAgent } from "../agent/PerusahaanAgent";
 
-
 export async function addBarangHandler(request: Request, response: Response, databarang: BarangAgent, dataperusahaan: PerusahaanAgent) {
     const { nama, harga, stok, perusahaan_id, kode } = request.body;
     const testbarang = await databarang.test(kode);
@@ -12,6 +11,23 @@ export async function addBarangHandler(request: Request, response: Response, dat
             status: "error",
             message: `Kode Barang already exists`,
             data: null
+        })
+    }
+
+    const perusahaanEntityByName = await dataperusahaan.name(perusahaan_id);
+    if (perusahaanEntityByName) {
+        const barang = await databarang.insert(nama, harga, stok, perusahaanEntityByName, kode);
+        return response.status(200).json({
+            status: "success",
+            message: `Barang ${nama} Added Successfully`,
+            data: {
+                id: barang.id,
+                nama: barang.nama,
+                harga: barang.harga,
+                stok: barang.stok,
+                kode: barang.kode,
+                perusahaan_id: barang.perusahaan.id 
+            },
         })
     }
 
@@ -53,6 +69,7 @@ export async function deleteBarangHandler(request: Request, response: Response, 
             data: null
         })
     } else {
+        console.log(barang);
         return response.status(200).json({
             status: "success",
             message: `Barang ${barang.nama} Removed Successfully`,
@@ -152,10 +169,19 @@ export async function getBarangHandler(request: Request, response: Response, dat
 
     if (!searchString && !perusahaanString) {
         const items = await databarang.search1()
+        const reformat = items.map(barang => ({
+            id: barang.id,
+            nama: barang.nama,
+            harga: barang.harga,
+            stok: barang.stok,
+            kode: barang.kode,
+            perusahaan_id: barang.perusahaan.id
+        }))
+    
         return response.status(200).json({
             status: "success",
             message: `Barang Found`,
-            data: items
+            data: reformat
         })
     }
       
@@ -169,29 +195,53 @@ export async function getBarangHandler(request: Request, response: Response, dat
             })
         }
 
-        const items = await databarang.search2(perusahaanString);
+        const items = await databarang.search3(perusahaanString);
+        const reformat = items.map(barang => ({
+            id: barang.id,
+            nama: barang.nama,
+            harga: barang.harga,
+            stok: barang.stok,
+            kode: barang.kode,
+            perusahaan_id: barang.perusahaan.id
+        }))
 
         return response.status(200).json({
             status: "success",
             message: `Barang Found`,
-            data: items
+            data: reformat
         })
     }
 
     if (!perusahaanString && searchString) {
-        const items = await databarang.search3(searchString)
+        const items = await databarang.search2(searchString)
+        const reformat = items.map(barang => ({
+            id: barang.id,
+            nama: barang.nama,
+            harga: barang.harga,
+            stok: barang.stok,
+            kode: barang.kode,
+            perusahaan_id: barang.perusahaan.id
+        }))
         return response.status(200).json({
             status: "success",
             message: `Barang Found`,
-            data: items
+            data: reformat
         })
     }
 
     const items = await databarang.search4(perusahaanString, searchString)
+    const reformat = items.map(barang => ({
+        id: barang.id,
+        nama: barang.nama,
+        harga: barang.harga,
+        stok: barang.stok,
+        kode: barang.kode,
+        perusahaan_id: barang.perusahaan.id
+    }))
 
     return response.status(200).json({
         status: "success",
         message: `Barang Found`,
-        data: items
+        data: reformat
     })
 }

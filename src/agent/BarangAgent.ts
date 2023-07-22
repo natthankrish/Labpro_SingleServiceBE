@@ -39,7 +39,7 @@ export class BarangAgent {
         return this.userRepository
                 .createQueryBuilder('barang')
                 .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
-                .where('perusahaan.id = :perusahaanString', { perusahaan_id })
+                .where('perusahaan.id = :perusahaanString', { perusahaanString: `${perusahaan_id}` })
                 .getMany();
     }
 
@@ -48,25 +48,27 @@ export class BarangAgent {
             .createQueryBuilder('barang')
             .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
             .where('barang.nama LIKE :searchString OR barang.kode LIKE :searchString', { searchString: `%${searchString}%` })
-            .andWhere('perusahaan.id = :perusahaanString', { perusahaan_id })
+            .andWhere('perusahaan.id = :perusahaanString', { perusahaanString: `${perusahaan_id}` })
             .getMany();
     }
 
     async one(id: string): Promise<Barang> {
-        const user = await this.userRepository.findOne({
-            where: { id: id }
-        })
-
+        const user = await this.userRepository.createQueryBuilder('barang')
+                                        .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
+                                        .where('barang.id = :id', { id })
+                                        .getOne();
         if (!user) {
             return null;
         }
+
         return user
     }
 
     async test(kode: string): Promise<Barang> {
-        const user = await this.userRepository.findOne({
-            where: { kode: kode }
-        })
+        const user = await this.userRepository.createQueryBuilder('barang')
+                                            .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
+                                            .where('barang.kode = :kode', { kode })
+                                            .getOne();
 
         if (!user) {
             return null;
@@ -81,9 +83,10 @@ export class BarangAgent {
     }
 
     async delete(id: string): Promise<Barang> {
-        const barang = await this.userRepository.findOne({
-            where: { id: id }
-        })
+        const barang = await this.userRepository.createQueryBuilder('barang')
+                                                .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
+                                                .where('barang.id = :id', { id })
+                                                .getOne();
 
         if (!barang) {
             return null;
@@ -97,9 +100,10 @@ export class BarangAgent {
     }
 
     async update(id: string, nama:string, harga:number, stok:number, perusahaan:Perusahaan, kode:string): Promise<Barang> {
-        const barang = await this.userRepository.findOne({
-            where: { id: id }
-        })
+        const barang = await this.userRepository.createQueryBuilder('barang')
+                                                .leftJoinAndSelect('barang.perusahaan', 'perusahaan')
+                                                .where('barang.id = :id', { id })
+                                                .getOne();
 
         barang.id = id;
         barang.nama = nama;

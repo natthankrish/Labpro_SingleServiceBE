@@ -32,29 +32,4 @@ export class UserAgent {
         await this.userRepository.insert(user);
     }
 
-    // async save(request: Request, response: Response, next: NextFunction) {
-    //     const { username, password } = request.body;
-
-    //     const user = Object.assign(new User(), {
-    //         username,
-    //         password
-    //     })
-
-    //     return this.userRepository.save(user)
-    // }
-
-    // async remove(request: Request, response: Response, next: NextFunction) {
-    //     const id = parseInt(request.params.id)
-
-    //     let userToRemove = await this.userRepository.findOneBy({ id })
-
-    //     if (!userToRemove) {
-    //         return "this user not exist"
-    //     }
-
-    //     await this.userRepository.remove(userToRemove)
-
-    //     return "user has been removed"
-    // }
-
 }
