@@ -20,7 +20,7 @@ export async function createSessionHandler(request: Request, response: Response,
             password: user.password,
             name: user.name
         },
-        "5s"
+        "1y"
     );
 
 
@@ -30,7 +30,7 @@ export async function createSessionHandler(request: Request, response: Response,
         data: {
             user: {
                 username: username,
-                name: "haha",
+                name: user.name,
             },
             token: accessToken,
         },
@@ -89,7 +89,9 @@ export function checkToken(req: Request, res: Response, next: NextFunction) {
         bearerToken = token; 
     } 
    
-    const { payload, expired } = verifyJWT(bearerToken); 
+    const { payload, expired } = verifyJWT(bearerToken);
+    
+    console.log(payload);
    
     //@ts-ignore 
     if (!payload) { 

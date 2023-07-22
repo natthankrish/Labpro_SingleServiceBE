@@ -1,9 +1,23 @@
-version: "3"
-services:
-  postgres:
-    image: postgres
-    environment: 
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "0000"
-    ports:
-      - "6500:5432"
+version: '3.8' 
+  
+services: 
+  app: 
+    build: 
+      context: . 
+      dockerfile: Dockerfile 
+    ports: 
+      - '3000:3000' 
+    depends_on: 
+      - db 
+
+  db: 
+    build: 
+      context: . 
+      dockerfile: Dockerfile.postgres 
+    ports: 
+      - '5432:5432' 
+
+volumes: 
+  db: 
+    driver: localnatthankrish
+

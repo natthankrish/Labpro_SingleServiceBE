@@ -28,7 +28,7 @@ export class UserAgent {
     }
 
     async insert(username: string, password:string, name:string) {
-        const user = new User(username, password, name);
+        const user = new User(username, name, password);
         await this.userRepository.insert(user);
     }
 

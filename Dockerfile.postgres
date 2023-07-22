@@ -1,0 +1,9 @@
+FROM postgres:latest 
+  
+ENV POSTGRES_USER=test
+ENV POSTGRES_PASSWORD=0000
+ENV POSTGRES_DB=SingleServiceBE 
+
+EXPOSE 5432
+
+CMD ["postgres"]
