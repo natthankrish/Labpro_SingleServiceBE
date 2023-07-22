@@ -1,5 +1,4 @@
 import * as jwt from "jsonwebtoken";
-// import { privateKey } from "../config";
 
 const privateKey = `
 -----BEGIN RSA PRIVATE KEY-----
