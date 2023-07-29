@@ -7,7 +7,7 @@ Antonio Natthan Krishna - 13521162
 ```sh
 git clone https://github.com/natthankrish/Labpro_SingleServiceBE.git
 ```
-2. Change the current directory to `OHL_Monolith` folder
+2. Change the current directory to `Labpro_SingleServiceBE` folder
 ```sh
 cd Labpro_SingleServiceBE
 ```
