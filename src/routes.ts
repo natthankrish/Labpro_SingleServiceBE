@@ -37,7 +37,7 @@ function routes(app: Express, db: DataSource) {
     })
 
     app.delete('/perusahaan/:id', SessionHandler.checkToken, (req, res) => {
-        PerusahaanHandler.deletePerusahaanHandler(req, res, perusahaan);
+        PerusahaanHandler.deletePerusahaanHandler(req, res, perusahaan, barang);
     })
 
     app.put('/perusahaan/:id', SessionHandler.checkToken, (req, res) => {

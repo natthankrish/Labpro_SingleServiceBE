@@ -1,11 +1,28 @@
 import { Request, Response } from "express"
 import { PerusahaanAgent } from "../agent/PerusahaanAgent"
-import { type } from "os";
+import { BarangAgent } from "../agent/BarangAgent";
 
 
 export async function addPerusahaanHandler(request: Request, response: Response, data: PerusahaanAgent) {
     const { nama, alamat, no_telp, kode } = request.body;
-    const perusahaan = await data.insert(nama, alamat, no_telp, kode);
+    const test = await data.test(kode.toUpperCase());
+
+    if (test) {
+        return response.status(401).json({
+            status: "error",
+            message: `Kode Perusahaan already exists`,
+            data: null
+        })
+    }
+
+    if (kode.length != 3) {
+        return response.status(401).json({
+            status: "error",
+            message: `Kode Perusahaan harus terdiri atas 3 huruf`,
+            data: null
+        })
+    }
+    const perusahaan = await data.insert(nama, alamat, no_telp, kode.toUpperCase());
 
     return response.status(200).json({
         status: "success",
@@ -20,10 +37,15 @@ export async function addPerusahaanHandler(request: Request, response: Response,
     })
 }
   
-export async function deletePerusahaanHandler(request: Request, response: Response, data: PerusahaanAgent) {
+export async function deletePerusahaanHandler(request: Request, response: Response, dataperusahaan: PerusahaanAgent, databarang: BarangAgent) {
     const { id } = request.params;
+    const barang = await databarang.search3(id);
 
-    const perusahaan = await data.delete(id);
+    for (const item of barang) {
+        databarang.delete(item.id)
+    }
+
+    const perusahaan = await dataperusahaan.delete(id);
 
     if (!perusahaan) {
         return response.status(401).json({
@@ -50,8 +72,22 @@ export async function updatePerusahaanHandler(request: Request, response: Respon
     const { id } = request.params;
     const { nama, alamat, no_telp, kode } = request.body;
 
-    if (id == "undefined") {
-        return;
+    const test = await data.test(kode.toUpperCase());
+
+    if (test && id != test.id) {
+        return response.status(401).json({
+            status: "error",
+            message: `Kode Perusahaan already exists`,
+            data: null
+        })
+    }
+
+    if (kode.length != 3) {
+        return response.status(401).json({
+            status: "error",
+            message: `Kode Perusahaan harus terdiri atas 3 huruf`,
+            data: null
+        })
     }
 
     const perusahaan = await data.update(id, nama, alamat, no_telp, kode);

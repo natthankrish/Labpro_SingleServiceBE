@@ -41,6 +41,22 @@ export async function addBarangHandler(request: Request, response: Response, dat
         })
     }
 
+    if (harga <= 0) {
+        return response.status(401).json({
+            status: "error",
+            message: `Harga harus positif`,
+            data: null
+        })
+    }
+
+    if (stok < 0) {
+        return response.status(401).json({
+            status: "error",
+            message: `Stok tidak boleh negatif`,
+            data: null
+        })
+    }
+
     const barang = await databarang.insert(nama, harga, stok, testperusahaan, kode);
 
     return response.status(200).json({
@@ -115,6 +131,22 @@ export async function updateBarangHandler(request: Request, response: Response, 
         return response.status(401).json({
             status: "error",
             message: `Barang not found`,
+            data: null
+        })
+    }
+
+    if (harga <= 0) {
+        return response.status(401).json({
+            status: "error",
+            message: `Harga harus positif`,
+            data: null
+        })
+    }
+
+    if (stok < 0) {
+        return response.status(401).json({
+            status: "error",
+            message: `Stok tidak boleh negatif`,
             data: null
         })
     }

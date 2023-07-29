@@ -83,4 +83,10 @@ export class PerusahaanAgent {
 
         return perusahaan
     }
+
+    async test (kode: string) {
+        return this.userRepository.findOne({
+            where: {kode: kode}
+        })
+    }
 }
